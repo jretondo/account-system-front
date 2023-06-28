@@ -50,11 +50,11 @@ const UserForm = ({
     const getUser = async () => {
         const response = await axiosGet(apiRoutes.usersDir.sub.details, idDetail)
         if (!response.error) {
-            setName(response.data[0].name)
-            setLastName(response.data[0].lastName)
-            setUser(response.data[0].user)
-            setEmail(response.data[0].email)
-            setPhone(response.data[0].phone)
+            setName(response.data.name)
+            setLastName(response.data.lastname)
+            setUser(response.data.user)
+            setEmail(response.data.email)
+            setPhone(response.data.phone)
         } else {
             newAlert("danger", "Hubo un error al querer ver el detalle", "error: " + response.errorMsg)
         }

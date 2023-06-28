@@ -6,7 +6,7 @@ import { Container, Row, Col } from "reactstrap";
 import logo from 'assets/img/brand/logo_2.png';
 
 import AuthFooter from "components/Footers/AuthFooter.js";
-import AuthNavbar from 'components/Navbars/AuthNavbar';
+//import AuthNavbar from 'components/Navbars/AuthNavbar';
 
 import routes from "routes/login";
 
@@ -37,8 +37,7 @@ const Auth = () => {
   return (
     <>
       <div className="main-content">
-        <AuthNavbar />
-        <div className="header bg-primary py-5">
+        <div className="header bg-primary py-4">
           <Container>
             <div className="header-body text-center mb-7">
               <Row className="justify-content-center">
@@ -65,7 +64,7 @@ const Auth = () => {
           </div>
         </div>
         {/* Page content */}
-        <Container className="mt--8 pb-5">
+        <Container className="mt--8 pb-2">
           <Row className="justify-content-center">
             <Switch>
               {getRoutes(routes)}

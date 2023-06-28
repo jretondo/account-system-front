@@ -82,7 +82,7 @@ const UserRow = ({
                 {item.name + " " + item.lastname}
             </td>
             <td style={{ textAlign: "center" }}>
-                {item.name}
+                {item.user}
             </td>
             <td style={{ textAlign: "center" }}>
                 {item.email}

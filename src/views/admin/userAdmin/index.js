@@ -56,6 +56,7 @@ const UserAdmin = () => {
                                 setNewForm={setNewForm}
                                 idUser={idUser}
                                 userName={userName}
+                                setIsLoading={setIsLoading}
                             />
                             :
                             <UserForm
