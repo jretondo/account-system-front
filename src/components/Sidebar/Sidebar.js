@@ -84,6 +84,7 @@ class Sidebar extends React.Component {
               }
 
               const found = res.data.body.find(check)
+              const admin = localStorage.getItem("admin")
 
               if (prop.id === 0) {
                 return (
@@ -101,7 +102,6 @@ class Sidebar extends React.Component {
                   </NavItem>
                 );
               } if (prop.id === 1) {
-                const admin = localStorage.getItem("admin")
                 if (admin) {
                   return (
                     <NavItem key={key}>
@@ -120,6 +120,21 @@ class Sidebar extends React.Component {
                 }
               } else {
                 if (found) {
+                  return (
+                    <NavItem key={key}>
+                      <NavLink
+                        to={prop.layout + prop.path}
+                        tag={NavLinkRRD}
+                        onClick={this.closeCollapse}
+                        activeClassName="active"
+                        style={{ color: "#0081c9", fontWeight: "bold" }}
+                      >
+                        <i className={prop.icon} />
+                        {prop.name}
+                      </NavLink>
+                    </NavItem>
+                  );
+                } else if (admin) {
                   return (
                     <NavItem key={key}>
                       <NavLink

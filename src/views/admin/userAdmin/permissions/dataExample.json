@@ -1,0 +1,70 @@
+{
+    "data": [
+        {
+            "id": 0,
+            "business_name": "Cliente 1",
+            "enabled": true,
+            "modules": [
+                {
+                    "id": 0,
+                    "module_name": "module 1",
+                    "permission_grade": 1
+                },
+                {
+                    "id": 1,
+                    "module_name": "module 2",
+                    "permission_grade": 0
+                },
+                {
+                    "id": 2,
+                    "module_name": "module 3",
+                    "permission_grade": 2
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "business_name": "Cliente 2",
+            "enabled": false,
+            "modules": [
+                {
+                    "id": 0,
+                    "module_name": "module 1",
+                    "permission_grade": 1
+                },
+                {
+                    "id": 1,
+                    "module_name": "module 2",
+                    "permission_grade": 0
+                },
+                {
+                    "id": 2,
+                    "module_name": "module 3",
+                    "permission_grade": 2
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "business_name": "Cliente 3",
+            "enabled": false,
+            "modules": [
+                {
+                    "id": 0,
+                    "module_name": "module 1",
+                    "permission_grade": 1
+                },
+                {
+                    "id": 1,
+                    "module_name": "module 2",
+                    "permission_grade": 0
+                },
+                {
+                    "id": 2,
+                    "module_name": "module 3",
+                    "permission_grade": 2
+                }
+            ]
+        }
+    ]
+}

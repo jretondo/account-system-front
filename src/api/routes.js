@@ -17,6 +17,8 @@ const routes = host + "/routes"
 const permissions = host + "/permissions"
 const users = host + "/user"
 const activity = host + "/activity"
+const clients = host + "/clients"
+const certificates = host + "/certificates"
 
 const authDir = {
     auth
@@ -41,11 +43,27 @@ const usersDir = {
     }
 }
 
+const clientsDir = {
+    clients,
+    sub: {
+
+    }
+}
+
+const certificatesDir = {
+    certificates,
+    sub: {
+        csr: certificates + "/csr"
+    }
+}
+
 const routesDir = {
     routes,
     sub: {
         dashboard: routes + "/dashboard",
-        userAdmin: routes + "/userAdmin"
+        userAdmin: routes + "/userAdmin",
+        clients: routes + "/clients",
+        certificates: routes + "/certificates"
     }
 }
 
@@ -55,7 +73,9 @@ const API_ROUTES = {
     routesDir,
     permissionsDir,
     usersDir,
-    activityDir
+    activityDir,
+    clientsDir,
+    certificatesDir
 }
 
 export default API_ROUTES
