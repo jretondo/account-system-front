@@ -29,6 +29,7 @@ const CertificatesModule = () => {
                         <ClientsForm
                             certificateInfo={certificateInfo}
                             setIsOpenCertificateForm={setIsOpenCertificateForm}
+                            setIsLoading={setIsLoading}
                         />
                         : isOpenCertRequest ?
                             <CertRequestForm

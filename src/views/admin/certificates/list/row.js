@@ -2,7 +2,7 @@ import API_ROUTES from '../../../../api/routes';
 import ActionsBackend from 'context/actionsBackend';
 import AlertsContext from 'context/alerts';
 import React, { useContext } from 'react';
-import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
+import { Button, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 import swal from 'sweetalert';
 
 const CertificateRow = ({
@@ -11,13 +11,13 @@ const CertificateRow = ({
     first,
     page,
     setCertificateInfo,
-    setIsOpenClientForm,
+    setIsOpenCertificateForm,
     setPage,
     refreshToggle
 }) => {
 
     const { newAlert, newActivity } = useContext(AlertsContext)
-    const { axiosDelete, loadingActions } = useContext(ActionsBackend)
+    const { axiosDelete, loadingActions, axiosPut } = useContext(ActionsBackend)
 
     const deleteUser = async (e, id, certificateInfo, first, page) => {
         e.preventDefault()
@@ -34,7 +34,7 @@ const CertificateRow = ({
             .then(async (willDelete) => {
                 let backPage = false
                 if (willDelete) {
-                    const response = await axiosDelete(API_ROUTES.clientsDir.clients, id)
+                    const response = await axiosDelete(API_ROUTES.certificatesDir.certificates, id)
                     if (!response.error) {
                         if (first) {
                             if (page > 1) {
@@ -58,19 +58,48 @@ const CertificateRow = ({
     const details = (e, client) => {
         e.preventDefault()
         setCertificateInfo(client)
-        setIsOpenClientForm(true)
+        setIsOpenCertificateForm(true)
+    }
+
+    const changeStateCert = async (id, enabled) => {
+        const data = {
+            id: id,
+            field: {
+                enabled: !enabled
+            }
+        }
+        const response = await axiosPut(API_ROUTES.certificatesDir.certificates, data)
+        if (!response.error) {
+            refreshToggle()
+        } else {
+            newAlert("danger", "Hubo un error!", "Intentelo nuevamente. Error: " + response.errorMsg)
+        }
     }
 
     return (
         <tr key={id} className={loadingActions ? "shimmer" : ""} >
+            <td style={{ textAlign: "center" }}>
+                {certificate.id}
+            </td>
+            <td style={{ textAlign: "center" }}>
+                {certificate.crt_name}
+            </td>
             <td style={{ textAlign: "center" }}>
                 {certificate.business_name}
             </td>
             <td style={{ textAlign: "center" }}>
                 {certificate.document_number}
             </td>
-            <td>
-
+            <td style={{ textAlign: "center" }}>
+                <Button
+                    color={certificate.enabled ? "success" : "gray"}
+                    onClick={e => {
+                        e.preventDefault()
+                        changeStateCert(certificate.id, certificate.enabled)
+                    }}
+                >
+                    {certificate.enabled ? "Activo" : "Deshabilitado"}
+                </Button>
             </td>
             <td className="text-right">
                 <UncontrolledDropdown>
@@ -94,7 +123,7 @@ const CertificateRow = ({
                         </DropdownItem>
                         <DropdownItem
                             href="#pablo"
-                            onClick={e => deleteUser(e, certificate.id, certificate.business_name + " CUIT: " + certificate.document_number, first, page)}
+                            onClick={e => deleteUser(e, certificate.id, certificate.crt_name + " de ID: " + certificate.id, first, page)}
                         >
                             <i className="fas fa-trash-alt"></i>
                             Eliminar

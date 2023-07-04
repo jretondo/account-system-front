@@ -12,7 +12,7 @@ const CertificatesList = ({
     setIsOpenCertRequest,
     setIsLoading
 }) => {
-    const titlesArray = ["Razón Social", "CUIT", "Activo", ""]
+    const titlesArray = ["Id", "Nombre", "Razón Social", "CUIT", "Activo", ""]
     const [list, setList] = useState(<></>)
     const [page, setPage] = useState(1)
     const [refreshList, setRefreshList] = useState(false)
@@ -24,7 +24,7 @@ const CertificatesList = ({
         errorList,
         loadingList
     } = useAxiosGetList(
-        API_ROUTES.clientsDir.clients,
+        API_ROUTES.certificatesDir.certificates,
         page, refreshList, [{ query: stringSearched }]
     )
 
@@ -41,7 +41,7 @@ const CertificatesList = ({
             )
         } else {
             setList(
-                dataPage.map((client, key) => {
+                dataPage.map((certificate, key) => {
                     let first
                     if (key === 0) {
                         first = true
@@ -52,13 +52,13 @@ const CertificatesList = ({
                         <CertificateRow
                             key={key}
                             id={key}
-                            client={client}
+                            certificate={certificate}
                             first={first}
                             page={page}
                             setCertificateInfo={setCertificateInfo}
                             setIsOpenCertificateForm={setIsOpenCertificateForm}
                             setPage={setPage}
-                            refreshToggle={refreshList}
+                            refreshToggle={() => setRefreshList(!refreshList)}
                         />
                     )
                 })

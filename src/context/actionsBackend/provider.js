@@ -4,7 +4,6 @@ import ActionsBackend from './index';
 import React from 'react';
 import { processQueries } from 'function/processQueries';
 import FileSaver from 'file-saver'
-import { PropTypes } from "prop-types";
 
 const ActionsBackendProvider = ({ children }) => {
     const [loadingActions, setLoadingActions] = useState(false)
@@ -299,10 +298,10 @@ const ActionsBackendProvider = ({ children }) => {
         })
             .then(response => response.json())
             .then(res => {
-                if (res.data.status === 201 || res.data.status === 200) {
+                if (res.status === 201 || res.status === 200) {
                     return {
                         error: false,
-                        data: res.data.body,
+                        data: res.body,
                         errorMsg: ""
                     }
                 } else {

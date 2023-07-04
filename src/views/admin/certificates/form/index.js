@@ -1,34 +1,60 @@
-import React, { useContext, useState } from 'react';
-import { Card, CardBody, CardHeader, Col, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+import React, { useContext, useEffect, useState } from 'react';
+import { Card, CardBody, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import certImg from 'assets/img/icons/crtImg.png';
 import keyImg from 'assets/img/icons/keyImg.png';
 import AlertsContext from 'context/alerts';
 import ActionsBackend from 'context/actionsBackend';
 import API_ROUTES from '../../../../api/routes';
-import { randomNumber } from 'function/randomNumber';
+import { verifyDocumentNumber } from 'function/verifyDocumentNumber';
 
 const CertificatesForm = ({
     certificateInfo,
-    setIsOpenCertificateForm
+    setIsOpenCertificateForm,
+    setIsLoading
 }) => {
-    const [documentNumber, setDocumentNumber] = useState("")
-    const [businessName, setBusinessName] = useState("")
+    const [documentNumber, setDocumentNumber] = useState(certificateInfo ? certificateInfo.document_number : "")
+    const [isDocumentValid, setIsDocumentValid] = useState(false)
+    const [businessName, setBusinessName] = useState(certificateInfo ? certificateInfo.business_name : "")
+    const [certificateName, setCertificateName] = useState(certificateInfo ? certificateInfo.crt_name : "")
     const [certFile, setCertFile] = useState("")
     const [keyFile, setKeyFile] = useState("")
-    const [urlCrt, setUrlCrt] = useState("")
-    const [urlKey, setUrlKey] = useState("")
+    const [urlCrt, setUrlCrt] = useState(certificateInfo ? true : "")
+    const [urlKey, setUrlKey] = useState(certificateInfo ? true : "")
 
     const { newAlert, newActivity } = useContext(AlertsContext)
-    const { axiosGet, fetchPostFormData, loadingActions } = useContext(ActionsBackend)
+    const { fetchPostFormData, loadingActions } = useContext(ActionsBackend)
 
     const newCertificatePost = async () => {
-        const dataPost = new FormData();
-        dataPost.append("certFile", certFile, `${documentNumber}-${randomNumber()}.crt`);
-        dataPost.append("keyFile", keyFile, `${documentNumber}-${randomNumber()}.key`);
-        dataPost.append("documentNumber", documentNumber);
-        dataPost.append("businessName", businessName);
+        if (isDocumentValid) {
 
-        await fetchPostFormData(API_ROUTES.certificatesDir.certificates, dataPost)
+            const dataPost = new FormData();
+            if (certFile !== "" && keyFile !== "") {
+                dataPost.append("crt_file", certFile, `${documentNumber}.crt`);
+                dataPost.append("key_file", keyFile, `${documentNumber}.key`);
+            }
+            certificateInfo && dataPost.append("id", certificateInfo.id);
+            dataPost.append("document_number", documentNumber);
+            dataPost.append("business_name", businessName);
+            dataPost.append("crt_name", certificateName);
+
+            const response = await fetchPostFormData(API_ROUTES.certificatesDir.certificates, dataPost)
+
+            if (!response.error) {
+                if (certificateInfo) {
+                    newActivity(`Ha modificado el certificado de la empresa ${businessName} CUIT: ${documentNumber}`)
+                    newAlert("success", "Certificado modificado con éxito!", "")
+                    setIsOpenCertificateForm(false)
+                } else {
+                    newActivity(`Se ha creado el certificado de la empresa ${businessName} CUIT: ${documentNumber}`)
+                    newAlert("success", "Certificado agregado con éxito!", "")
+                    setIsOpenCertificateForm(false)
+                }
+            } else {
+                newAlert("danger", "Hubo un error!", "Revise que el número de CUIT ya exista. Error: " + response.errorMsg)
+            }
+        } else {
+            newAlert("danger", "Hubo un error!", "Controle el número de CUIT, es erroneo.")
+        }
     }
 
     const PickCert = (e) => {
@@ -41,6 +67,9 @@ const CertificatesForm = ({
         setKeyFile(e.target.files[0])
     }
 
+    useEffect(() => {
+        setIsLoading(loadingActions)
+    }, [loadingActions, setIsLoading])
 
     return (<>
         <Card>
@@ -66,7 +95,7 @@ const CertificatesForm = ({
                     newCertificatePost();
                 }} >
                     <Row>
-                        <Col md="4">
+                        <Col md="3">
                             <FormGroup>
                                 <Label for="cuitTxt">CUIT</Label>
                                 <Input
@@ -75,10 +104,14 @@ const CertificatesForm = ({
                                     placeholder="CUIT..."
                                     value={documentNumber}
                                     onChange={e => setDocumentNumber(e.target.value)}
+                                    onBlur={(e) => { verifyDocumentNumber(e.target.value).isValid ? setIsDocumentValid(true) : setIsDocumentValid(false) }}
+                                    invalid={!isDocumentValid}
+                                    valid={isDocumentValid}
                                     required />
+                                <FormFeedback>El CUIT no es válido. Reviselo!</FormFeedback>
                             </FormGroup>
                         </Col>
-                        <Col md="8">
+                        <Col md="5">
                             <FormGroup>
                                 <Label for="businessNameTxt">Razón Social</Label>
                                 <Input
@@ -87,6 +120,18 @@ const CertificatesForm = ({
                                     placeholder="Razón Social..."
                                     value={businessName}
                                     onChange={e => setBusinessName(e.target.value)}
+                                    required />
+                            </FormGroup>
+                        </Col>
+                        <Col md="4">
+                            <FormGroup>
+                                <Label for="certNameTxt">Nombre del certificado</Label>
+                                <Input
+                                    type="text"
+                                    id="certNameTxt"
+                                    placeholder="Certificado 1, Punto de venta X, etc..."
+                                    value={certificateName}
+                                    onChange={e => setCertificateName(e.target.value)}
                                     required />
                             </FormGroup>
                         </Col>
@@ -142,7 +187,6 @@ const CertificatesForm = ({
                                         <h3>{certFile.name}</h3>
                                     </Col>
                             }
-
                         </Col>
                         <Col lg="6">
                             {
@@ -196,7 +240,6 @@ const CertificatesForm = ({
                             }
                         </Col>
                     </Row>
-
                     <Row>
                         <Col md="12" style={{ textAlign: "center" }}>
                             <button
