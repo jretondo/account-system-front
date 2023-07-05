@@ -53,7 +53,8 @@ const clientsDir = {
 const certificatesDir = {
     certificates,
     sub: {
-        csr: certificates + "/csr"
+        csr: certificates + "/csr",
+        crtKey: certificates + "/crt-key"
     }
 }
 

@@ -17,7 +17,7 @@ const CertificateRow = ({
 }) => {
 
     const { newAlert, newActivity } = useContext(AlertsContext)
-    const { axiosDelete, loadingActions, axiosPut } = useContext(ActionsBackend)
+    const { axiosDelete, loadingActions, axiosPut, axiosGetFile } = useContext(ActionsBackend)
 
     const deleteUser = async (e, id, certificateInfo, first, page) => {
         e.preventDefault()
@@ -76,6 +76,16 @@ const CertificateRow = ({
         }
     }
 
+    const downloadCertificate = async (e, id) => {
+        e.preventDefault()
+        const response = await axiosGetFile(API_ROUTES.certificatesDir.sub.crtKey, id, "application/x-gzip")
+        if (!response.error) {
+            newAlert("success", "Archivo descargado con éxito!", "Descomprima el archivo para encontrar el .crt y el .key")
+        } else {
+            newAlert("danger", "Hubo un error!", "Revise los datos colocados. Error: " + response.errorMsg)
+        }
+    }
+
     return (
         <tr key={id} className={loadingActions ? "shimmer" : ""} >
             <td style={{ textAlign: "center" }}>
@@ -114,6 +124,13 @@ const CertificateRow = ({
                         <i className="fas fa-ellipsis-v" />
                     </DropdownToggle>
                     <DropdownMenu className="dropdown-menu-arrow" right>
+                        <DropdownItem
+                            href="#pablo"
+                            onClick={e => downloadCertificate(e, certificate.id)}
+                        >
+                            <i className="fas fa-download"></i>
+                            Descargar .crt y .key
+                        </DropdownItem>
                         <DropdownItem
                             href="#pablo"
                             onClick={e => details(e, certificate)}
