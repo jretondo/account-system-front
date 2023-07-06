@@ -13,7 +13,7 @@ const CertificatesForm = ({
     setIsLoading
 }) => {
     const [documentNumber, setDocumentNumber] = useState(certificateInfo ? certificateInfo.document_number : "")
-    const [isDocumentValid, setIsDocumentValid] = useState(false)
+    const [isDocumentValid, setIsDocumentValid] = useState(certificateInfo ? true : false)
     const [businessName, setBusinessName] = useState(certificateInfo ? certificateInfo.business_name : "")
     const [certificateName, setCertificateName] = useState(certificateInfo ? certificateInfo.crt_name : "")
     const [certFile, setCertFile] = useState("")
@@ -108,7 +108,7 @@ const CertificatesForm = ({
                                     invalid={!isDocumentValid}
                                     valid={isDocumentValid}
                                     required />
-                                <FormFeedback>El CUIT no es válido. Reviselo!</FormFeedback>
+                                <FormFeedback valid={isDocumentValid}>{isDocumentValid ? "CUIT válido!" : "El CUIT no es válido. Reviselo!"}</FormFeedback>
                             </FormGroup>
                         </Col>
                         <Col md="5">

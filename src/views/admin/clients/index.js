@@ -28,6 +28,7 @@ const ClientsModule = () => {
                         <ClientsForm
                             clientInfo={clientInfo}
                             setIsOpenClientForm={setIsOpenClientForm}
+                            setIsLoading={setIsLoading}
                         /> :
                         <ClientsList
                             setClientInfo={setClientInfo}
