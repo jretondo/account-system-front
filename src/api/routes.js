@@ -46,7 +46,8 @@ const usersDir = {
 const clientsDir = {
     clients,
     sub: {
-        dataTax: clients + "/dataTax"
+        dataTax: clients + "/dataTax",
+        dataTaxProof: clients + "/dataTaxProof"
     }
 }
 

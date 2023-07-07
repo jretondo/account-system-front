@@ -3,7 +3,7 @@ import ActionsBackend from 'context/actionsBackend';
 import AlertsContext from 'context/alerts';
 import { verifyDocumentNumber } from 'function/verifyDocumentNumber';
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Col, Form, FormFeedback, FormGroup, Input, InputGroup, InputGroupAddon, Label, Row, Tooltip } from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Col, Form, FormGroup, Input, InputGroup, InputGroupAddon, Label, Row, Tooltip } from 'reactstrap';
 
 const ClientsForm = ({
     clientInfo,
@@ -22,9 +22,10 @@ const ClientsForm = ({
     const [city, setCity] = useState("")
     const [clientDataTax, setClientDataTax] = useState({})
     const [dataInfoToolTip, setDataInfoToolTip] = useState(false)
+    const [isMono, setIsMono] = useState(false)
 
     const { newAlert, newActivity } = useContext(AlertsContext)
-    const { axiosGetQuery, loadingActions } = useContext(ActionsBackend)
+    const { axiosGetQuery, loadingActions, axiosQueryFile } = useContext(ActionsBackend)
 
     const newClientPost = () => {
         const dataPost = {
@@ -40,6 +41,19 @@ const ClientsForm = ({
             activity_description: activity
         }
 
+    }
+
+    const downloadTaxProof = async () => {
+        const dataPost = {
+            clientDataTax,
+            isMono
+        }
+        const response = await axiosQueryFile(API_ROUTES.clientsDir.sub.dataTaxProof, dataPost, "application/pdf")
+        if (!response.error) {
+            newAlert("success", "Archivo descargado con éxito!", "En el PDF se encuentra la constancia de inscripción del contribuyente.")
+        } else {
+            newAlert("danger", "Hubo un error!", "Posiblemente no tenga un certificado activo o los permisos en AFIP para acceder al padrón. Error: " + response.errorMsg)
+        }
     }
 
     const getClientDataTax = async (e) => {
@@ -62,7 +76,9 @@ const ClientsForm = ({
                 if (response.data.data.datosMonotributo) {
                     setIvaConditionId(20)
                     setActivity(response.data.data.datosMonotributo.actividadMonotributista.descripcionActividad)
+                    setIsMono(true)
                 } else {
+                    setIsMono(false)
                     const taxes = response.data.data.datosRegimenGeneral.impuesto
                     taxes.map(item => {
                         switch (item.idImpuesto) {
@@ -94,9 +110,14 @@ const ClientsForm = ({
             setIsDocumentValid(false)
         }
     }
+
     useEffect(() => {
         setIsLoading(loadingActions)
     }, [loadingActions, setIsLoading])
+
+    useEffect(() => {
+        console.log('clientDataTax :>> ', clientDataTax);
+    }, [clientDataTax])
 
     return (<>
         <Card>
@@ -137,13 +158,19 @@ const ClientsForm = ({
                                         valid={isDocumentValid}
                                         required />
                                     <InputGroupAddon addonType="append">
-                                        <Button id="btnTaxInfo" color={isDocumentValid ? "success" : "danger"} disabled={!isDocumentValid}><i className='fas fa-search'></i></Button>
+                                        <Button
+                                            id="btnTaxInfo"
+                                            color={isDocumentValid ? "success" : "danger"}
+                                            onClick={e => {
+                                                e.preventDefault()
+                                                downloadTaxProof()
+                                            }}
+                                            disabled={!isDocumentValid}><i className='fas fa-search'></i></Button>
                                     </InputGroupAddon>
                                 </ InputGroup>
                                 <Tooltip placement="top" isOpen={dataInfoToolTip} target="btnTaxInfo" toggle={() => setDataInfoToolTip(!dataInfoToolTip)}>
                                     Ver información completa
                                 </Tooltip>
-                                <FormFeedback valid={isDocumentValid}>{isDocumentValid ? "CUIT válido!" : "El CUIT no es válido. Reviselo!"}</FormFeedback>
                             </FormGroup>
                         </Col>
                         <Col md="6">
@@ -178,7 +205,7 @@ const ClientsForm = ({
                         </Col>
                     </Row>
                     <Row>
-                        <Col md="6">
+                        <Col md="4">
                             <FormGroup>
                                 <Label for="fantasieTxt">Nombre de Fantasía</Label>
                                 <Input
@@ -191,7 +218,7 @@ const ClientsForm = ({
                                 />
                             </FormGroup>
                         </Col>
-                        <Col md="6">
+                        <Col md="8">
                             <FormGroup>
                                 <Label for="fantasieTxt">Actividad</Label>
                                 <Input
@@ -205,19 +232,6 @@ const ClientsForm = ({
                         </Col>
                     </Row>
                     <Row>
-                        <Col md="4">
-                            <FormGroup>
-                                <Label for="phoneTxt">Telefóno</Label>
-                                <Input
-                                    type="text"
-                                    name="phone"
-                                    id="phoneTxt"
-                                    placeholder="Telefóno del cliente..."
-                                    value={phone}
-                                    onChange={e => setPhone(e.target.value)}
-                                />
-                            </FormGroup>
-                        </Col>
                         <Col md="8">
                             <FormGroup>
                                 <Label for="emailTxt">Email</Label>
@@ -228,6 +242,19 @@ const ClientsForm = ({
                                     placeholder="Email del cliente..."
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
+                                />
+                            </FormGroup>
+                        </Col>
+                        <Col md="4">
+                            <FormGroup>
+                                <Label for="phoneTxt">Telefóno</Label>
+                                <Input
+                                    type="text"
+                                    name="phone"
+                                    id="phoneTxt"
+                                    placeholder="Telefóno del cliente..."
+                                    value={phone}
+                                    onChange={e => setPhone(e.target.value)}
                                 />
                             </FormGroup>
                         </Col>

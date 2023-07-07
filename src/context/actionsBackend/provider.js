@@ -245,7 +245,7 @@ const ActionsBackendProvider = ({ children }) => {
         })
     }
 
-    const axiosQueryPDF = async (url, queries) => {
+    const axiosQueryFile = async (url, queries, fileType) => {
         setLoadingActions(true)
         let query = ""
         if (queries.length > 0) {
@@ -255,14 +255,14 @@ const ActionsBackendProvider = ({ children }) => {
             responseType: 'arraybuffer',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('user-token'),
-                Accept: 'application/pdf',
+                Accept: fileType,
             },
         }).then(res => {
             if (res.status === 200) {
                 let headerLine = res.headers['content-disposition'];
                 const largo = parseInt(headerLine.length)
                 let filename = headerLine.substring(21, largo);
-                var blob = new Blob([res.data], { type: "application/pdf" });
+                var blob = new Blob([res.data], { type: fileType });
                 FileSaver.saveAs(blob, filename);
                 return {
                     error: false,
@@ -332,7 +332,7 @@ const ActionsBackendProvider = ({ children }) => {
             axiosGetQuery,
             axiosPostFile,
             axiosGetFile,
-            axiosQueryPDF,
+            axiosQueryFile,
             fetchPostFormData
         }}>
             {children}
