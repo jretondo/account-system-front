@@ -115,11 +115,12 @@ const UserRow = ({
                             onClick={e => givePermissions(e, item.id, item.name + " " + item.lastname)}
                         >
                             <i className="fas fa-id-card"></i>
-                            Dar Permisos
+                            Permisos
                         </DropdownItem>
                         <DropdownItem
                             href="#pablo"
                             onClick={e => deleteUser(e, item.id, item.name + " " + item.lastname, first, page)}
+                            disabled={item.admin}
                         >
                             <i className="fas fa-trash-alt"></i>
                             Eliminar

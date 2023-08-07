@@ -16,17 +16,32 @@ class Admin extends React.Component {
     this.refs.mainContent.scrollTop = 0;
   }
   getRoutes = routes => {
+    // eslint-disable-next-line
     return routes.map((prop, key) => {
-      if (prop.layout === process.env.PUBLIC_URL + "/admin") {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
+      if (!prop.component) {
+        if (prop.layout === process.env.PUBLIC_URL + "/admin") {
+          return prop.sub.map((item, key1) => {
+            return (
+              <Route
+                path={prop.layout + item.path}
+                component={item.component}
+                key={key1}
+              />
+            );
+          })
+        }
       } else {
-        return null;
+        if (prop.layout === process.env.PUBLIC_URL + "/admin") {
+          return (
+            <Route
+              path={prop.layout + prop.path}
+              component={prop.component}
+              key={key}
+            />
+          );
+        } else {
+          return null;
+        }
       }
     });
   };
@@ -38,6 +53,17 @@ class Admin extends React.Component {
         ) !== -1
       ) {
         return routes[i].name;
+      }
+      if (!routes[i].component) {
+        for (let e = 0; e < routes[i].sub.length; e++) {
+          if (
+            this.props.location.pathname.indexOf(
+              routes[i].layout + routes[i].sub[e].path
+            ) !== -1
+          ) {
+            return `${routes[i].name} / ${routes[i].sub[e].name}`;
+          }
+        }
       }
     }
     return "Brand";

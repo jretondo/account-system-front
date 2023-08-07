@@ -15,7 +15,7 @@ const NavClient = ({ id, name, enabled, clientActive, setClientActive }) => {
                             { background: "#f5365c" }}
                 onClick={() => setClientActive(id)}
             >
-                {name}
+                {name.length > 20 ? name.slice(0, 20) + "..." : name}
             </NavLink>
         </NavItem>
     )

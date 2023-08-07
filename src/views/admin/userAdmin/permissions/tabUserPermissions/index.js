@@ -10,9 +10,9 @@ const TabUserPermission = ({ permissionsList, setPermissionsList }) => {
 
     const toggleClientEnabled = (enabled, id) => {
         setPermissionsList(permissions => permissions.map((permission) => {
-            if (permission.id === id) {
+            if (permission.client_id === id) {
                 return ({
-                    id: permission.id,
+                    client_id: permission.client_id,
                     business_name: permission.business_name,
                     enabled: !enabled,
                     modules: permission.modules
@@ -25,22 +25,22 @@ const TabUserPermission = ({ permissionsList, setPermissionsList }) => {
 
     const changePermissionGrade = (grade, clientId, module) => {
         const newModule = {
-            id: module.id,
+            module_id: module.module_id,
             module_name: module.module_name,
             permission_grade: grade
         }
 
         setPermissionsList(permissions => permissions.map((permission) => {
-            if (permission.id === clientId) {
+            if (permission.client_id === clientId) {
                 const modules = permission.modules.map((moduleItem) => {
-                    if (moduleItem.id === module.id) {
+                    if (moduleItem.module_id === module.module_id) {
                         return newModule
                     } else {
                         return moduleItem
                     }
                 })
                 return ({
-                    id: permission.id,
+                    client_id: permission.client_id,
                     business_name: permission.business_name,
                     enabled: permission.enabled,
                     modules: modules
@@ -60,7 +60,7 @@ const TabUserPermission = ({ permissionsList, setPermissionsList }) => {
                 {navClient}
                 <NavClient
                     key={key}
-                    id={client.id}
+                    id={client.client_id}
                     name={client.business_name}
                     clientActive={clientActive}
                     setClientActive={setClientActive}
@@ -71,7 +71,7 @@ const TabUserPermission = ({ permissionsList, setPermissionsList }) => {
                 {tabClient}
                 <TabClient
                     key={key}
-                    id={client.id}
+                    id={client.client_id}
                     toggleEnabled={toggleClientEnabled}
                     enabled={client.enabled}
                     modules={client.modules}

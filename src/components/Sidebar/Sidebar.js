@@ -21,8 +21,6 @@ import {
 } from "reactstrap";
 import Img1 from 'assets/img/theme/default-avatar.png';
 import logo_transparent from 'assets/img/brand/logo_transparent.png';
-import axios from "axios";
-import apiRoutes from "../../api/routes";
 import { ModalMyProfile } from "../Modals/ModalProfile";
 import { ModalActivity } from "components/Modals/ModalActivity";
 
@@ -31,7 +29,7 @@ class Sidebar extends React.Component {
     collapseOpen: false,
     name: localStorage.getItem("name"),
     lastname: localStorage.getItem("lastName"),
-    isAdmin: parseInt(localStorage.getItem("admin")),
+    isAdmin: localStorage.getItem("admin"),
     modalProfile: false,
     modalAct: false
   };
@@ -69,24 +67,56 @@ class Sidebar extends React.Component {
   }
   // creates the links that appear in the left menu / Sidebar
   createLinks = async (routes) => {
-    await axios.get(apiRoutes.permissionsDir.permissions, {
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('user-token') }
-    })
-      .then(res => {
-        this.setState({
-          data: (
-            // eslint-disable-next-line
-            routes.map((prop, key) => {
-              const id = prop.id
-
-              function check(item) {
-                return item.id_permission === id;
-              }
-
-              const found = res.data.body.find(check)
-              const admin = localStorage.getItem("admin")
-
-              if (prop.id === 0) {
+    this.setState({
+      data: (
+        // eslint-disable-next-line
+        routes.map((prop, key) => {
+          const admin = localStorage.getItem("admin")
+          if (!prop.path) {
+            return (
+              <UncontrolledDropdown nav inNavbar key={key}>
+                <DropdownToggle nav caret
+                  style={{ color: "#0081c9", fontWeight: "bold" }}
+                >
+                  <i className={prop.icon} />
+                  {prop.name}
+                </DropdownToggle>
+                <DropdownMenu right>
+                  {prop.sub.map((item, key) => {
+                    return (
+                      <DropdownItem key={key}>
+                        <NavLink
+                          to={prop.layout + item.path}
+                          tag={NavLinkRRD}
+                          onClick={this.closeCollapse}
+                          style={{ color: "black", cursor: "pointer", padding: "0", paddingLeft: "10px" }}
+                        >
+                          {item.name}
+                        </NavLink>
+                      </DropdownItem>
+                    )
+                  })}
+                </DropdownMenu>
+              </UncontrolledDropdown>
+            );
+          } else {
+            if (prop.id === 0) {
+              return (
+                <NavItem key={key}>
+                  <NavLink
+                    to={prop.layout + prop.path}
+                    tag={NavLinkRRD}
+                    onClick={this.closeCollapse}
+                    activeClassName="active"
+                    style={{ color: "#0081c9", fontWeight: "bold" }}
+                  >
+                    <i className={prop.icon} />
+                    {prop.name}
+                  </NavLink>
+                </NavItem>
+              );
+            } if (prop.id < 4) {
+              if (admin) {
                 return (
                   <NavItem key={key}>
                     <NavLink
@@ -101,66 +131,26 @@ class Sidebar extends React.Component {
                     </NavLink>
                   </NavItem>
                 );
-              } if (prop.id === 1) {
-                if (admin) {
-                  return (
-                    <NavItem key={key}>
-                      <NavLink
-                        to={prop.layout + prop.path}
-                        tag={NavLinkRRD}
-                        onClick={this.closeCollapse}
-                        activeClassName="active"
-                        style={{ color: "#0081c9", fontWeight: "bold" }}
-                      >
-                        <i className={prop.icon} />
-                        {prop.name}
-                      </NavLink>
-                    </NavItem>
-                  );
-                }
-              } else {
-                if (found) {
-                  return (
-                    <NavItem key={key}>
-                      <NavLink
-                        to={prop.layout + prop.path}
-                        tag={NavLinkRRD}
-                        onClick={this.closeCollapse}
-                        activeClassName="active"
-                        style={{ color: "#0081c9", fontWeight: "bold" }}
-                      >
-                        <i className={prop.icon} />
-                        {prop.name}
-                      </NavLink>
-                    </NavItem>
-                  );
-                } else if (admin) {
-                  return (
-                    <NavItem key={key}>
-                      <NavLink
-                        to={prop.layout + prop.path}
-                        tag={NavLinkRRD}
-                        onClick={this.closeCollapse}
-                        activeClassName="active"
-                        style={{ color: "#0081c9", fontWeight: "bold" }}
-                      >
-                        <i className={prop.icon} />
-                        {prop.name}
-                      </NavLink>
-                    </NavItem>
-                  );
-                } else {
-                  return null
-                }
               }
-            }))
-        })
-      })
-      .catch(() => {
-        this.setState({
-          exit: true
-        })
-      })
+            } else {
+              return (
+                <NavItem key={key}>
+                  <NavLink
+                    to={prop.layout + prop.path}
+                    tag={NavLinkRRD}
+                    onClick={this.closeCollapse}
+                    activeClassName="active"
+                    style={{ color: "#0081c9", fontWeight: "bold" }}
+                  >
+                    <i className={prop.icon} />
+                    {prop.name}
+                  </NavLink>
+                </NavItem>
+              );
+            }
+          }
+        }))
+    })
   };
 
   componentDidMount() {

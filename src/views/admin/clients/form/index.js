@@ -10,24 +10,25 @@ const ClientsForm = ({
     setIsOpenClientForm,
     setIsLoading
 }) => {
-    const [documentNumber, setDocumentNumber] = useState("")
-    const [isDocumentValid, setIsDocumentValid] = useState(false)
-    const [businessName, setBusinessName] = useState("")
-    const [fantasieName, setFantasieName] = useState("")
-    const [email, setEmail] = useState("")
-    const [ivaConditionId, setIvaConditionId] = useState(30)
-    const [direction, setDirection] = useState("")
-    const [phone, setPhone] = useState("")
-    const [activity, setActivity] = useState("")
-    const [city, setCity] = useState("")
+    console.log('clientInfo :>> ', clientInfo);
+    const [documentNumber, setDocumentNumber] = useState(clientInfo ? clientInfo.document_number : "")
+    const [isDocumentValid, setIsDocumentValid] = useState(clientInfo ? true : false)
+    const [businessName, setBusinessName] = useState(clientInfo ? clientInfo.business_name : "")
+    const [fantasieName, setFantasieName] = useState(clientInfo ? clientInfo.fantasie_name : "")
+    const [email, setEmail] = useState(clientInfo ? clientInfo.email : "")
+    const [ivaConditionId, setIvaConditionId] = useState(clientInfo ? clientInfo.iva_condition_id : 30)
+    const [direction, setDirection] = useState(clientInfo ? clientInfo.direction : "")
+    const [phone, setPhone] = useState(clientInfo ? clientInfo.phone : "")
+    const [activity, setActivity] = useState(clientInfo ? clientInfo.activity_description : "")
+    const [city, setCity] = useState(clientInfo ? clientInfo.city : "")
     const [clientDataTax, setClientDataTax] = useState({})
     const [dataInfoToolTip, setDataInfoToolTip] = useState(false)
     const [isMono, setIsMono] = useState(false)
 
     const { newAlert, newActivity } = useContext(AlertsContext)
-    const { axiosGetQuery, loadingActions, axiosQueryFile } = useContext(ActionsBackend)
+    const { axiosGetQuery, loadingActions, axiosQueryFile, axiosPost } = useContext(ActionsBackend)
 
-    const newClientPost = () => {
+    const newClientPost = async () => {
         const dataPost = {
             document_type: 80,
             document_number: documentNumber,
@@ -40,14 +41,22 @@ const ClientsForm = ({
             city: city,
             activity_description: activity
         }
-
+        clientInfo && (dataPost.id = clientInfo.id)
+        const response = await axiosPost(API_ROUTES.clientsDir.clients, dataPost)
+        if (!response.error) {
+            newAlert("success", "Registrado con éxito!", "Cliente registrado éxitosamente!")
+            newActivity("Ha registrado al cliente: " + businessName + " (" + documentNumber + ")")
+            setIsOpenClientForm(false)
+        } else {
+            newAlert("danger", "Hubo un error!", "Controle que todos los datos sean los correctos!. Error: " + response.errorMsg)
+        }
     }
 
     const downloadTaxProof = async () => {
-        const dataPost = {
-            clientDataTax,
-            isMono
-        }
+        const dataPost = [
+            { documentNumber },
+            { isMono }
+        ]
         const response = await axiosQueryFile(API_ROUTES.clientsDir.sub.dataTaxProof, dataPost, "application/pdf")
         if (!response.error) {
             newAlert("success", "Archivo descargado con éxito!", "En el PDF se encuentra la constancia de inscripción del contribuyente.")
@@ -80,6 +89,7 @@ const ClientsForm = ({
                 } else {
                     setIsMono(false)
                     const taxes = response.data.data.datosRegimenGeneral.impuesto
+                    // eslint-disable-next-line 
                     taxes.map(item => {
                         switch (item.idImpuesto) {
                             case 30:

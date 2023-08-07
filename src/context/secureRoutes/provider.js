@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import SecureRoutesContext from './index';
 import { Redirect } from "react-router-dom";
+import LoadingContext from 'context/loading';
 
 const SecureRoutesProvider = ({ children }) => {
     const [isLogin, setIsLogin] = useState(true)
     const [urlRoute, setUrlRoute] = useState("")
-
+    const { setIsLoading } = useContext(LoadingContext)
     const fetchSecureRoute = useCallback(async () => {
         try {
             let res = await fetch(urlRoute, {
@@ -45,6 +46,7 @@ const SecureRoutesProvider = ({ children }) => {
             </SecureRoutesContext.Provider>
         )
     } else {
+        setIsLoading(false)
         return (
             <Redirect
                 className="text-light"

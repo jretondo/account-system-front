@@ -57,7 +57,7 @@ const ClientsList = ({
                             setClientInfo={setClientInfo}
                             setIsOpenClientForm={setIsOpenClientForm}
                             setPage={setPage}
-                            refreshToggle={refreshList}
+                            refreshToggle={() => setRefreshList(!refreshList)}
                         />
                     )
                 })
@@ -74,7 +74,7 @@ const ClientsList = ({
             <CardHeader className="border-0">
                 <Row>
                     <Col md="4" >
-                        <h2 className="mb-0">Lista de Clientes</h2>
+                        <h2 className="mb-0">Lista de Empresas</h2>
                     </Col>
                     <Col md="8" style={{ textAlign: "right" }}>
                         <SearchFormComponent
@@ -82,7 +82,7 @@ const ClientsList = ({
                             stringSearched={stringSearched}
                             setRefreshList={setRefreshList}
                             refreshList={refreshList}
-                            title="Buscar un cliente"
+                            title="Buscar una empresa"
                         />
                     </Col>
                 </Row>

@@ -1,7 +1,7 @@
 import API_ROUTES from '../../../../api/routes';
 import ActionsBackend from 'context/actionsBackend';
 import AlertsContext from 'context/alerts';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 import swal from 'sweetalert';
 
@@ -15,7 +15,7 @@ const ClientRow = ({
     setPage,
     refreshToggle
 }) => {
-
+    const [ivaConditionStr, setIvaConditionStr] = useState("")
     const { newAlert, newActivity } = useContext(AlertsContext)
     const { axiosDelete, loadingActions } = useContext(ActionsBackend)
 
@@ -61,6 +61,28 @@ const ClientRow = ({
         setIsOpenClientForm(true)
     }
 
+    useEffect(() => {
+        switch (client.iva_condition_id) {
+            case 30:
+                setIvaConditionStr("IVA Responsable Inscripto")
+                break;
+            case 32:
+                setIvaConditionStr("IVA Sujeto Exento")
+                break;
+            case 20:
+                setIvaConditionStr("Responsable Monotributo")
+                break;
+            case 33:
+                setIvaConditionStr("IVA Responsable No Inscripto")
+                break;
+            case 34:
+                setIvaConditionStr("IVA No Alcanzado")
+                break;
+            default:
+                break;
+        }
+    }, [client.iva_condition_id])
+
     return (
         <tr key={id} className={loadingActions ? "shimmer" : ""} >
             <td style={{ textAlign: "center" }}>
@@ -73,7 +95,7 @@ const ClientRow = ({
                 {client.email}
             </td>
             <td style={{ textAlign: "center" }}>
-                {client.iva_condition}
+                {ivaConditionStr}
             </td>
             <td className="text-right">
                 <UncontrolledDropdown>

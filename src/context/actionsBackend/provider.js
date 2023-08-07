@@ -9,6 +9,8 @@ const ActionsBackendProvider = ({ children }) => {
     const [loadingActions, setLoadingActions] = useState(false)
 
     const axiosPost = async (url, data) => {
+        console.log('url :>> ', url);
+        console.log('data :>> ', data);
         setLoadingActions(true)
         return await axios.post(url, data, {
             headers: {

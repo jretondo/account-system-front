@@ -39,7 +39,9 @@ const usersDir = {
     users,
     sub: {
         details: users + "/details",
-        mydata: users + "/mydata"
+        mydata: users + "/mydata",
+        permissions: users + "/permissions",
+        clients: users + "/clients"
     }
 }
 

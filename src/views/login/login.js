@@ -74,11 +74,19 @@ const Login = () => {
         const status = parseInt(response.status)
         if (status === 200) {
           setLoading(false)
-          const provisory = parseInt(res.data.body.provisory)
+
+          const provisory = res.data.body.provisory
           const userData = res.data.body.userData
           localStorage.setItem("name", userData.name)
           localStorage.setItem("lastName", userData.lastname)
-          localStorage.setItem("admin", userData.admin)
+
+          if (!userData.admin) {
+          } else if (userData.admin) {
+            localStorage.setItem("admin", true)
+          } else {
+            localStorage.setItem("admin", userData.admin)
+          }
+
           if (provisory) {
             if (rememberCred) {
               localStorage.setItem("savedEmail", user)

@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Card, CardBody, CardHeader, Col, Container, Row } from 'reactstrap'
 import alertsContext from 'context/alerts';
 import actionsBackend from 'context/actionsBackend';
-import data from './dataExample.json';
 import TabUserPermission from './tabUserPermissions';
 
 const UserPermissions = ({
@@ -12,22 +11,44 @@ const UserPermissions = ({
     userName,
     setIsLoading
 }) => {
-    const [permissionsList, setPermissionsList] = useState(data.data)
+    const [permissionsList, setPermissionsList] = useState([])
 
     const { newAlert, newActivity } = useContext(alertsContext)
-    const { axiosGet, axiosPost, loadingActions } = useContext(actionsBackend)
+    const { axiosGetQuery, axiosPost, loadingActions } = useContext(actionsBackend)
 
     useEffect(() => {
         setIsLoading(loadingActions)
     }, [loadingActions, setIsLoading])
 
-    const getPermissions = () => {
-
+    const getPermissions = async () => {
+        const response = await axiosGetQuery(apiRoutes.usersDir.sub.permissions, [])
+        if (!response.error) {
+            setPermissionsList(response.data)
+        } else {
+            newAlert("danger", "Hubo un problema!", "Hubo un error al querer traer los permisos y los clientes. Controle que haya clientes cargados.")
+        }
     }
 
-    const postNewPermissions = () => {
-
+    const postNewPermissions = async () => {
+        const dataPost = {
+            permissionsList,
+            idUser
+        }
+        const response = await axiosPost(apiRoutes.usersDir.sub.permissions, dataPost)
+        console.log('response :>> ', response);
+        if (!response.error) {
+            newActivity(`El administrador le concedió nuevos permisos al usuario ${userName} (id: ${idUser})`)
+            newAlert("success", "Registrado con éxito!", "Fueron concedido los nuevos permisos.")
+            setNewForm(false)
+        } else {
+            newAlert("danger", "Hubo un problema!", "No se puedieron actualizar los permisos. intente nuevamente. Si persiste llamar a soporte.")
+        }
     }
+
+    useEffect(() => {
+        getPermissions()
+        // eslint-disable-next-line
+    }, [])
 
     return (
         <Card>
